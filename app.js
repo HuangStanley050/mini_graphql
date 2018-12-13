@@ -1,6 +1,7 @@
 const express = require("express");
 const bodyParser = require("body-parser");
 const graphqlHTTP = require("express-graphql");
+const mongoose = require("mongoose");
 const { buildSchema } = require("graphql");
 const app = express();
 const port = process.env.port || 8081;
@@ -58,5 +59,14 @@ app.use(
     graphiql: true
   })
 );
-
-app.listen(port, () => console.log("server running"));
+mongoose
+  .connect(
+    `mongodb+srv://${process.env.MONGO_USER}:${
+      process.env.MONGO_PASSWORD
+    }@cluster0-cjli2.mongodb.net/${process.env.MONGO_DB}?retryWrites=true`,
+    { useNewUrlParser: true }
+  )
+  .then(() => {
+    app.listen(port, () => console.log("server running"));
+  })
+  .catch(err => console.log(err));
