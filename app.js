@@ -2,6 +2,7 @@ const express = require("express");
 const bodyParser = require("body-parser");
 const graphqlHTTP = require("express-graphql");
 const mongoose = require("mongoose");
+const Event = require("./models/event");
 const { buildSchema } = require("graphql");
 const app = express();
 const port = process.env.port || 8081;
@@ -45,15 +46,21 @@ app.use(
         return events;
       },
       createEvent: args => {
-        const event = {
-          _id: Math.random().toString(),
+        const event = new Event({
           title: args.eventInput.title,
           description: args.eventInput.description,
           price: +args.eventInput.price,
-          date: new Date().toString()
-        };
-        events.push(event);
-        return event;
+          date: new Date(args.eventInput.date)
+        });
+        return event
+          .save()
+          .then(res => {
+            return res;
+          })
+          .catch(err => {
+            console.log(err);
+            throw err;
+          });
       }
     },
     graphiql: true
