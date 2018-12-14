@@ -43,7 +43,21 @@ app.use(
     `),
     rootValue: {
       events: () => {
-        return events;
+        return Event.find()
+          .then(events => {
+            return events.map(event => {
+              //const newObj = {};
+              const clone = Object.assign({}, event._doc);
+              const _id = event.id;
+              clone._id = _id;
+              //console.log(clone);
+              return clone;
+            });
+          })
+          .catch(err => {
+            console.log(err);
+            throw err;
+          });
       },
       createEvent: args => {
         const event = new Event({
@@ -55,7 +69,9 @@ app.use(
         return event
           .save()
           .then(res => {
-            return res;
+            const clone = Object.assign({}, res._doc);
+            clone._id = res.id;
+            return clone;
           })
           .catch(err => {
             console.log(err);
