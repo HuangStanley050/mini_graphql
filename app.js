@@ -20,6 +20,7 @@ app.use(
           description:String!
           price:Float!
           date:String!
+          creator:User!
          
        }
        
@@ -27,6 +28,7 @@ app.use(
          _id:ID!
          email:String!
          password:String
+         createdEvents:[Event!]
        }
        
        input EventInput {
@@ -58,13 +60,20 @@ app.use(
     rootValue: {
       events: () => {
         return Event.find()
+          .populate("creator")
           .then(events => {
             return events.map(event => {
               //const newObj = {};
               const clone = Object.assign({}, event._doc);
+              const creator_clone = Object.assign({}, event._doc.creator._doc);
               const _id = event.id;
               clone._id = _id;
-              //console.log(clone);
+
+              const creator_id = clone.creator.id;
+              creator_clone._id = creator_id;
+              clone.creator = creator_clone;
+
+              //console.log(creator_clone);
               return clone;
             });
           })
@@ -142,6 +151,6 @@ mongoose
     { useNewUrlParser: true }
   )
   .then(() => {
-    app.listen(port, () => console.log("server running"));
+    app.listen(port, () => console.log("server running on: " + port));
   })
   .catch(err => console.log(err));
