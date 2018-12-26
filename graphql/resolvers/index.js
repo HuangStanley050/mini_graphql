@@ -171,5 +171,17 @@ module.exports = {
       .catch(err => {
         throw err;
       });
+  },
+  cancelBooking: async args => {
+    try {
+      const booking = await Booking.findById(args.bookingId).populate("event");
+      const clone = Object.assign({}, booking.event_doc);
+      clone._id = booking.event.id;
+      clone.creator = user.bind(this, booking.event._doc.creator);
+      await Booking.deleteOne({ _id: args.bookingId });
+      return clone;
+    } catch (err) {
+      throw err;
+    }
   }
 };
