@@ -8,8 +8,41 @@ const User = require("./models/user");
 const { buildSchema } = require("graphql");
 const app = express();
 const port = process.env.PORT || 8081;
-const events = [];
+//const events = [];
+
 app.use(bodyParser.json());
+
+const user = userId => {
+  return User.findById(userId)
+    .then(user => {
+      const _id = user.id;
+      const clone_user = Object.assign({}, user._doc);
+      clone_user._id = _id;
+      clone_user.createdEvents = events.bind(this, user._doc.createdEvents);
+      return clone_user;
+    })
+    .catch(err => {
+      console.log(err);
+      throw err;
+    });
+};
+
+const events = eventIds => {
+  return Event.find({ _id: { $in: eventIds } })
+    .then(events => {
+      return events.map(event => {
+        const event_clone = Object.assign({}, event._doc);
+        event_clone._id = event.id;
+        event_clone.creator = user.bind(this, event.creator);
+        console.log(event_clone);
+        return event_clone;
+      });
+    })
+    .catch(err => {
+      throw err;
+    });
+};
+
 app.use(
   "/graphql",
   graphqlHTTP({
@@ -60,18 +93,19 @@ app.use(
     rootValue: {
       events: () => {
         return Event.find()
-          .populate("creator")
           .then(events => {
             return events.map(event => {
               //const newObj = {};
               const clone = Object.assign({}, event._doc);
-              const creator_clone = Object.assign({}, event._doc.creator._doc);
+              //const creator_clone = Object.assign({}, event._doc.creator._doc);
               const _id = event.id;
               clone._id = _id;
 
-              const creator_id = clone.creator.id;
-              creator_clone._id = creator_id;
-              clone.creator = creator_clone;
+              //const creator_id = clone.creator.id;
+              //creator_clone._id = creator_id;
+              //console.log(creator_id.toString());
+              //console.log(event._doc);
+              clone.creator = user.bind(this, event._doc.creator);
 
               //console.log(creator_clone);
               return clone;
