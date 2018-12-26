@@ -10,12 +10,25 @@ const user = userId => {
       const clone_user = Object.assign({}, user._doc);
       clone_user._id = _id;
       clone_user.createdEvents = events.bind(this, user._doc.createdEvents);
+      //console.log(clone_user);
       return clone_user;
     })
     .catch(err => {
       console.log(err);
       throw err;
     });
+};
+
+const singleEvent = async eventId => {
+  try {
+    const event = await Event.findById(eventId);
+    const clone = Object.assign({}, event._doc);
+    clone._id = event.id;
+    clone.creator = user.bind(this, event.creator);
+    return clone;
+  } catch (err) {
+    throw err;
+  }
 };
 
 const events = eventIds => {
@@ -72,6 +85,8 @@ module.exports = {
           booking_clone.updatedAt = new Date(
             booking._doc.updatedAt
           ).toISOString();
+          booking_clone.user = user.bind(this, booking._doc.user);
+          booking_clone.event = singleEvent.bind(this, booking._doc.event);
           return booking_clone;
         });
       })
@@ -148,6 +163,9 @@ module.exports = {
         clone._id = res.id;
         clone.createdAt = new Date(res._doc.createdAt).toISOString();
         clone.updatedAt = new Date(res._doc.updatedAt).toISOString();
+        clone.user = user.bind(this, res._doc.user);
+        clone.event = singleEvent.bind(this, res._doc.event);
+        //console.log(clone);
         return clone;
       })
       .catch(err => {
