@@ -2,9 +2,10 @@ const Event = require("../../models/event");
 const User = require("../../models/user");
 const Booking = require("../../models/booking");
 const bcrypt = require("bcryptjs");
+const { dateToString } = require("../../helper/date");
 
 const transformEvent = event => {
-  const date = new Date(event._doc.date).toISOString();
+  const date = dateToString(event._doc.date);
   const event_clone = Object.assign({}, event._doc);
   event_clone._id = event.id;
   event_clone.creator = user.bind(this, event.creator);
@@ -92,12 +93,14 @@ module.exports = {
         return bookings.map(booking => {
           const booking_clone = Object.assign({}, booking._doc);
           booking_clone._id = booking.id;
-          booking_clone.createdAt = new Date(
+          /*booking_clone.createdAt = new Date(
             booking._doc.createdAt
-          ).toISOString();
-          booking_clone.updatedAt = new Date(
+          ).toISOString();*/
+          booking_clone.createdAt = dateToString(booking._doc.createdAt);
+          /*booking_clone.updatedAt = new Date(
             booking._doc.updatedAt
-          ).toISOString();
+          ).toISOString();*/
+          booking_clone.updatedAt = dateToString(booking._doc.updatedAt);
           booking_clone.user = user.bind(this, booking._doc.user);
           booking_clone.event = singleEvent.bind(this, booking._doc.event);
           return booking_clone;
@@ -112,7 +115,8 @@ module.exports = {
       title: args.eventInput.title,
       description: args.eventInput.description,
       price: +args.eventInput.price,
-      date: new Date(args.eventInput.date),
+      //date: new Date(args.eventInput.date),
+      date: dateToString(args.eventInput.date),
       creator: "5c186fda0d2dd70833de0584"
     });
     let createdEvent;
@@ -174,8 +178,10 @@ module.exports = {
       .then(res => {
         const clone = Object.assign({}, res._doc);
         clone._id = res.id;
-        clone.createdAt = new Date(res._doc.createdAt).toISOString();
-        clone.updatedAt = new Date(res._doc.updatedAt).toISOString();
+        //clone.createdAt = new Date(res._doc.createdAt).toISOString();
+        clone.createdAt = dateToString(res._doc.createdAt);
+        //clone.updatedAt = new Date(res._doc.updatedAt).toISOString();
+        clone.updatedAt = dateToString(res._doc.updatedAt);
         clone.user = user.bind(this, res._doc.user);
         clone.event = singleEvent.bind(this, res._doc.event);
         //console.log(clone);
