@@ -3,6 +3,16 @@ const User = require("../../models/user");
 const Booking = require("../../models/booking");
 const bcrypt = require("bcryptjs");
 
+const transformEvent = event => {
+  const date = new Date(event._doc.date).toISOString();
+  const event_clone = Object.assign({}, event._doc);
+  event_clone._id = event.id;
+  event_clone.creator = user.bind(this, event.creator);
+  event_clone.date = date;
+  //console.log(event_clone);
+  return event_clone;
+};
+
 const user = userId => {
   return User.findById(userId)
     .then(user => {
@@ -22,10 +32,12 @@ const user = userId => {
 const singleEvent = async eventId => {
   try {
     const event = await Event.findById(eventId);
-    const clone = Object.assign({}, event._doc);
+    /*const clone = Object.assign({}, event._doc);
     clone._id = event.id;
     clone.creator = user.bind(this, event.creator);
-    return clone;
+    return clone;*/
+
+    return transformEvent(event);
   } catch (err) {
     throw err;
   }
@@ -35,13 +47,14 @@ const events = eventIds => {
   return Event.find({ _id: { $in: eventIds } })
     .then(events => {
       return events.map(event => {
-        const date = new Date(event._doc.date).toISOString();
+        /*const date = new Date(event._doc.date).toISOString();
         const event_clone = Object.assign({}, event._doc);
         event_clone._id = event.id;
         event_clone.creator = user.bind(this, event.creator);
         event_clone.date = date;
-        //console.log(event_clone);
-        return event_clone;
+        
+        return event_clone;*/
+        return transformEvent(event);
       });
     })
     .catch(err => {
@@ -54,9 +67,8 @@ module.exports = {
     return Event.find()
       .then(events => {
         return events.map(event => {
-          //const newObj = {};
-          const clone = Object.assign({}, event._doc);
-          //const creator_clone = Object.assign({}, event._doc.creator._doc);
+          /*const clone = Object.assign({}, event._doc);
+    
           const _id = event.id;
           clone._id = _id;
           const date = new Date(event._doc.date).toISOString();
@@ -64,8 +76,9 @@ module.exports = {
           clone.creator = user.bind(this, event._doc.creator);
           clone.date = date;
 
-          //console.log(creator_clone);
-          return clone;
+        
+          return clone;*/
+          return transformEvent(event);
         });
       })
       .catch(err => {
@@ -175,13 +188,14 @@ module.exports = {
   cancelBooking: async args => {
     try {
       const booking = await Booking.findById(args.bookingId).populate("event");
+      /*
       const clone = Object.assign({}, booking.event._doc);
-      //console.log(clone);
       clone._id = booking.event.id;
-      clone.creator = user.bind(this, booking.event._doc.creator);
+      clone.creator = user.bind(this, booking.event._doc.creator);*/
+
       await Booking.deleteOne({ _id: args.bookingId });
-      //console.log(clone);
-      return clone;
+
+      return transformEvent(booking.event);
     } catch (err) {
       throw err;
     }
