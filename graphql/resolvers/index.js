@@ -14,6 +14,22 @@ const transformEvent = event => {
   return event_clone;
 };
 
+const transformBooking = booking => {
+  const booking_clone = Object.assign({}, booking._doc);
+  booking_clone._id = booking.id;
+  /*booking_clone.createdAt = new Date(
+            booking._doc.createdAt
+          ).toISOString();*/
+  booking_clone.createdAt = dateToString(booking._doc.createdAt);
+  /*booking_clone.updatedAt = new Date(
+            booking._doc.updatedAt
+          ).toISOString();*/
+  booking_clone.updatedAt = dateToString(booking._doc.updatedAt);
+  booking_clone.user = user.bind(this, booking._doc.user);
+  booking_clone.event = singleEvent.bind(this, booking._doc.event);
+  return booking_clone;
+};
+
 const user = userId => {
   return User.findById(userId)
     .then(user => {
@@ -91,19 +107,7 @@ module.exports = {
     return Booking.find()
       .then(bookings => {
         return bookings.map(booking => {
-          const booking_clone = Object.assign({}, booking._doc);
-          booking_clone._id = booking.id;
-          /*booking_clone.createdAt = new Date(
-            booking._doc.createdAt
-          ).toISOString();*/
-          booking_clone.createdAt = dateToString(booking._doc.createdAt);
-          /*booking_clone.updatedAt = new Date(
-            booking._doc.updatedAt
-          ).toISOString();*/
-          booking_clone.updatedAt = dateToString(booking._doc.updatedAt);
-          booking_clone.user = user.bind(this, booking._doc.user);
-          booking_clone.event = singleEvent.bind(this, booking._doc.event);
-          return booking_clone;
+          return transformBooking(booking);
         });
       })
       .catch(err => {
@@ -176,16 +180,16 @@ module.exports = {
         return booking.save();
       })
       .then(res => {
-        const clone = Object.assign({}, res._doc);
+        /*const clone = Object.assign({}, res._doc);
         clone._id = res.id;
         //clone.createdAt = new Date(res._doc.createdAt).toISOString();
         clone.createdAt = dateToString(res._doc.createdAt);
         //clone.updatedAt = new Date(res._doc.updatedAt).toISOString();
         clone.updatedAt = dateToString(res._doc.updatedAt);
         clone.user = user.bind(this, res._doc.user);
-        clone.event = singleEvent.bind(this, res._doc.event);
-        //console.log(clone);
-        return clone;
+        clone.event = singleEvent.bind(this, res._doc.event);*/
+
+        return transformBooking(res);
       })
       .catch(err => {
         throw err;
