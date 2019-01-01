@@ -1,5 +1,7 @@
 const User = require("../../models/user");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
+const { secretToken } = require("../../tokenSecret");
 
 module.exports = {
   createUser: args => {
@@ -26,5 +28,25 @@ module.exports = {
       .catch(err => {
         throw err;
       });
+  },
+  login: async ({ email, password }) => {
+    const user = await User.findOne({ email: email });
+    if (!user) {
+      throw new Error("User Doesn't exits");
+    }
+    const isEqual = await bcrypt.compare(password, user.password);
+    if (!isEqual) {
+      throw new Error("Password doesn't exits");
+    }
+    const token = jwt.sign(
+      { userId: user.id, email: user.email },
+      secretToken,
+      { expiresIn: "1h" }
+    );
+    return {
+      userId: user.id,
+      token: token,
+      tokenExpiration: 1
+    };
   }
 };

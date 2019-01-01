@@ -1,4 +1,4 @@
-const { dateToString } = require("../../helper/date.js");
+const { dateToString } = require("../../helper/date");
 const Booking = require("../../models/booking");
 const Event = require("../../models/event");
 const { user, singleEvent } = require("./merge");
