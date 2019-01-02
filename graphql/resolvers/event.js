@@ -42,13 +42,14 @@ module.exports = {
     if (!req.isAuth) {
       throw new Error("Not authenticated");
     }
+    //use req.userId from the middleware instead of hard coded in
     const event = new Event({
       title: args.eventInput.title,
       description: args.eventInput.description,
       price: +args.eventInput.price,
       //date: new Date(args.eventInput.date),
       date: dateToString(args.eventInput.date),
-      creator: "5c186fda0d2dd70833de0584"
+      creator: req.userId
     });
     let createdEvent;
 
@@ -57,7 +58,7 @@ module.exports = {
       .then(res => {
         createdEvent = Object.assign({}, res._doc);
         createdEvent.creator = user.bind(this, res._doc.creator);
-        return User.findById("5c186fda0d2dd70833de0584");
+        return User.findById(req.userId);
       })
       .then(user => {
         if (!user) {

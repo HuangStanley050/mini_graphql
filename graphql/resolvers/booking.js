@@ -52,7 +52,7 @@ module.exports = {
     return Event.findOne({ _id: args.eventId })
       .then(event => {
         const booking = new Booking({
-          user: "5c186fda0d2dd70833de0584",
+          user: req.userId,
           event: event
         });
         return booking.save();
