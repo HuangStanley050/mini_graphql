@@ -6,9 +6,11 @@ const isAuth = require("./middlewares/is-auth");
 const graphQlSchema = require("./graphql/schemas/index.js");
 const graphQlResolvers = require("./graphql/resolvers/index.js");
 const app = express();
-const port = process.env.PORT || 8081;
+const cors = require("cors");
+const port = 8081 || process.env.PORT;
 
 app.use(bodyParser.json());
+app.use(cors());
 app.use(isAuth);
 app.use(
   "/graphql",

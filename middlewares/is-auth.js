@@ -3,6 +3,7 @@ const { secretToken } = require("../tokenSecret");
 
 module.exports = (req, res, next) => {
   const authHeader = req.get("Authorization");
+  //console.log(authHeader);
   if (!authHeader) {
     req.isAuth = false;
     return next();
@@ -10,6 +11,7 @@ module.exports = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   if (!token || token === "") {
     req.isAuth = false;
+    //console.log(token);
     return next();
   }
   let decodedToken;

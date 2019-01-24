@@ -1,17 +1,17 @@
 const { dateToString } = require("../../helper/date");
 const Event = require("../../models/event");
 const User = require("../../models/user");
-const { user } = require("./merge");
+const { user, transformEvent } = require("./merge");
 
-const transformEvent = event => {
-  const date = dateToString(event._doc.date);
-  const event_clone = Object.assign({}, event._doc);
-  event_clone._id = event.id;
-  event_clone.creator = user.bind(this, event.creator);
-  event_clone.date = date;
-  //console.log(event_clone);
-  return event_clone;
-};
+// const transformEvent = event => {
+//   const date = dateToString(event._doc.date);
+//   const event_clone = Object.assign({}, event._doc);
+//   event_clone._id = event.id;
+//   event_clone.creator = user.bind(this, event.creator);
+//   event_clone.date = date;
+//   //console.log(event_clone);
+//   return event_clone;
+// };
 
 module.exports = {
   events: () => {
@@ -56,8 +56,9 @@ module.exports = {
     return event
       .save()
       .then(res => {
-        createdEvent = Object.assign({}, res._doc);
-        createdEvent.creator = user.bind(this, res._doc.creator);
+        // createdEvent = Object.assign({}, res._doc);
+        // createdEvent.creator = user.bind(this, res._doc.creator);
+        createdEvent = transformEvent(res);
         return User.findById(req.userId);
       })
       .then(user => {
@@ -67,7 +68,7 @@ module.exports = {
         user.createdEvents.push(event);
         return user.save();
       })
-      .then(result => createdEvent)
+      .then(() => createdEvent)
       .catch(err => {
         console.log(err);
         throw err;
