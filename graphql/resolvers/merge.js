@@ -64,3 +64,4 @@ const events = eventIds => {
 exports.user = user;
 exports.events = events;
 exports.singleEvent = singleEvent;
+exports.transformEvent = transformEvent;
