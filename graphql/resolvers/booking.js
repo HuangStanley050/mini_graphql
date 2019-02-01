@@ -34,7 +34,7 @@ module.exports = {
     if (!req.isAuth) {
       throw new Error("Not authenticated");
     }
-    return Booking.find()
+    return Booking.find({ user: req.userId })
       .then(bookings => {
         return bookings.map(booking => {
           return transformBooking(booking);
