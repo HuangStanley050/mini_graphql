@@ -1,9 +1,19 @@
 const Event = require("../../models/event");
 const User = require("../../models/user");
 const { dateToString } = require("../../helper/date");
+const DataLoader = require("dataloader");
+
+const eventLoader = new DataLoader(eventIds => {
+  return events(eventIds);
+});
+
+const userLoader = new DataLoader(userIds => {
+  return User.find({ _id: { $in: userIds } });
+});
 
 const user = userId => {
-  return User.findById(userId)
+  return userLoader
+    .load(userId.toString())
     .then(user => {
       const _id = user.id;
       const clone_user = Object.assign({}, user._doc);
@@ -30,13 +40,13 @@ const transformEvent = event => {
 
 const singleEvent = async eventId => {
   try {
-    const event = await Event.findById(eventId);
+    const event = await eventLoader(eventId.toString());
     /*const clone = Object.assign({}, event._doc);
     clone._id = event.id;
     clone.creator = user.bind(this, event.creator);
     return clone;*/
 
-    return transformEvent(event);
+    return event;
   } catch (err) {
     throw err;
   }
